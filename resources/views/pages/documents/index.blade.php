@@ -74,7 +74,7 @@
                   <td>{{ \Illuminate\Support\Str::limit($document->deskripsi ?? '-', 80) }}</td>
                   <td>
                     @if ($document->file_path)
-                      <a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                      <a href="{{ route('documents.file.show', $document->id) }}" class="btn btn-outline-primary btn-sm">
                         Lihat File
                       </a>
                     @else

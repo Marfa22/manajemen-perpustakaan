@@ -9,6 +9,7 @@ use App\Models\Inventory;
 use App\Models\Location;
 use App\Services\SmartSearchService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -210,6 +211,59 @@ class InventoryController extends Controller
                 ->orderBy('name')
                 ->get(),
         ]);
+    }
+
+    public function showFile($id)
+    {
+        $inventory = Inventory::findOrFail($id);
+
+        if (empty($inventory->photo_path) || !Storage::disk('public')->exists($inventory->photo_path)) {
+            return redirect('/inventory')->with('error', 'File pendukung tidak ditemukan.');
+        }
+
+        $extension = strtolower(pathinfo($inventory->photo_path, PATHINFO_EXTENSION));
+        $mimeType = Storage::disk('public')->mimeType($inventory->photo_path) ?? 'application/octet-stream';
+        $previewableExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+
+        return view('pages.inventory.show-file', [
+            'inventory' => $inventory,
+            'previewUrl' => route('inventory.file.preview', $inventory->id),
+            'downloadUrl' => route('inventory.file.download', $inventory->id),
+            'fileExtension' => $extension,
+            'mimeType' => $mimeType,
+            'canPreviewInline' => in_array($extension, $previewableExtensions, true),
+        ]);
+    }
+
+    public function previewFile($id)
+    {
+        $inventory = Inventory::findOrFail($id);
+
+        if (empty($inventory->photo_path) || !Storage::disk('public')->exists($inventory->photo_path)) {
+            abort(Response::HTTP_NOT_FOUND, 'File pendukung tidak ditemukan.');
+        }
+
+        $headers = [
+            'Content-Type' => Storage::disk('public')->mimeType($inventory->photo_path) ?? 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="' . basename((string) $inventory->photo_path) . '"',
+        ];
+
+        return Storage::disk('public')->response($inventory->photo_path, basename((string) $inventory->photo_path), $headers);
+    }
+
+    public function downloadFile($id)
+    {
+        $inventory = Inventory::findOrFail($id);
+
+        if (empty($inventory->photo_path) || !Storage::disk('public')->exists($inventory->photo_path)) {
+            return redirect('/inventory')->with('error', 'File pendukung tidak ditemukan.');
+        }
+
+        $downloadName = trim((string) $inventory->nama) !== ''
+            ? $inventory->nama . '-dokumen.' . pathinfo((string) $inventory->photo_path, PATHINFO_EXTENSION)
+            : basename((string) $inventory->photo_path);
+
+        return Storage::disk('public')->download($inventory->photo_path, $downloadName);
     }
 
     public function update(Request $request, $id)

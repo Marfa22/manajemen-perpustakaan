@@ -152,7 +152,10 @@
                     </td>
                     <td>
                       @if ($product->photo_path)
-                        <img src="{{ asset('storage/' . $product->photo_path) }}" alt="Foto {{ $product->name }}" class="item-photo-thumb">
+                        <img src="{{ route('products.photo.preview', $product->id) }}" alt="Foto {{ $product->name }}" class="item-photo-thumb mb-2">
+                        <a href="{{ route('products.photo.show', $product->id) }}" class="btn btn-outline-primary btn-sm">
+                          Lihat
+                        </a>
                       @else
                         <span class="text-muted">-</span>
                       @endif

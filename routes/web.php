@@ -20,6 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/', [PublicDashboardController::class, 'index'])->name('public.home');
 Route::get('/dash-public', [PublicDashboardController::class, 'index'])->name('public.dashboard');
+Route::get('/dash-public/barang/{id}/photo', [PublicDashboardController::class, 'photo'])->whereNumber('id')->name('public.dashboard.photo');
 Route::get('/dash-public/barang/{id}', [PublicDashboardController::class, 'show'])->whereNumber('id')->name('public.dashboard.show');
 
 Route::middleware([IsLogin::class])->group(function () {
@@ -32,6 +33,9 @@ Route::middleware([IsLogin::class])->group(function () {
         Route::get('/inventory', [InventoryController::class, 'index']);
         Route::get('/inventory/create', [InventoryController::class, 'create']);
         Route::get('/inventory/edit/{id}', [InventoryController::class, 'edit']);
+        Route::get('/inventory/{id}/file', [InventoryController::class, 'showFile'])->name('inventory.file.show');
+        Route::get('/inventory/{id}/file/preview', [InventoryController::class, 'previewFile'])->name('inventory.file.preview');
+        Route::get('/inventory/{id}/file/download', [InventoryController::class, 'downloadFile'])->name('inventory.file.download');
         Route::post('/inventory/store', [InventoryController::class, 'store']);
         Route::put('/inventory/{id}', [InventoryController::class, 'update']);
         Route::delete('/inventory/{id}', [InventoryController::class, 'delete']);
@@ -45,6 +49,9 @@ Route::middleware([IsLogin::class])->group(function () {
         Route::get('/documents/create', [DocumentController::class, 'create']);
         Route::post('/documents/store', [DocumentController::class, 'store']);
         Route::get('/documents/edit/{id}', [DocumentController::class, 'edit']);
+        Route::get('/documents/{id}/file', [DocumentController::class, 'showFile'])->name('documents.file.show');
+        Route::get('/documents/{id}/file/preview', [DocumentController::class, 'previewFile'])->name('documents.file.preview');
+        Route::get('/documents/{id}/file/download', [DocumentController::class, 'downloadFile'])->name('documents.file.download');
         Route::put('/documents/{id}', [DocumentController::class, 'update']);
         Route::delete('/documents/{id}', [DocumentController::class, 'delete']);
     });
@@ -53,6 +60,8 @@ Route::middleware([IsLogin::class])->group(function () {
         Route::get('/products', [ProductController::class, 'index']);
         Route::get('/products/create', [ProductController::class, 'create']);
         Route::get('/products/edit/{id}', [ProductController::class, 'edit']);
+        Route::get('/products/{id}/photo', [ProductController::class, 'showPhoto'])->name('products.photo.show');
+        Route::get('/products/{id}/photo/preview', [ProductController::class, 'previewPhoto'])->name('products.photo.preview');
         Route::post('/products/store', [ProductController::class, 'store']);
         Route::post('/products/{id}/return', [ProductController::class, 'processReturn']);
         Route::put('/products/{id}', [ProductController::class, 'update']);

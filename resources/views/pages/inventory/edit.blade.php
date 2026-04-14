@@ -235,12 +235,15 @@
                     @endphp
                     <div class="mt-3">
                       @if ($existingFileIsImage)
-                        <img src="{{ asset('storage/' . $inventory->photo_path) }}" alt="Dokumen {{ $inventory->nama }}" class="item-photo-preview">
+                        <img src="{{ route('inventory.file.preview', $inventory->id) }}" alt="Dokumen {{ $inventory->nama }}" class="item-photo-preview">
                       @else
-                        <a href="{{ asset('storage/' . $inventory->photo_path) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ route('inventory.file.show', $inventory->id) }}" class="btn btn-outline-primary btn-sm">
                           Lihat
                         </a>
                       @endif
+                      <a href="{{ route('inventory.file.download', $inventory->id) }}" class="btn btn-outline-secondary btn-sm ml-2">
+                        Download
+                      </a>
                     </div>
                   @endif
                 </div>

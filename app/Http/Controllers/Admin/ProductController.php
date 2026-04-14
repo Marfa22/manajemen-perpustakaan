@@ -212,6 +212,42 @@ class ProductController extends Controller
         return redirect('/products')->with('success', 'Pengembalian barang berhasil diproses.');
     }
 
+    public function showPhoto($id)
+    {
+        $product = Product::with('category')
+            ->where('id', $id)
+            ->where('item_type', 'found')
+            ->firstOrFail();
+
+        if (empty($product->photo_path) || !Storage::disk('public')->exists($product->photo_path)) {
+            abort(404, 'Foto barang tidak ditemukan.');
+        }
+
+        return view('pages.products.show-photo', [
+            'product' => $product,
+            'previewUrl' => route('products.photo.preview', $product->id),
+        ]);
+    }
+
+    public function previewPhoto($id)
+    {
+        $product = Product::where('id', $id)
+            ->where('item_type', 'found')
+            ->firstOrFail();
+
+        if (empty($product->photo_path) || !Storage::disk('public')->exists($product->photo_path)) {
+            abort(404, 'Foto barang tidak ditemukan.');
+        }
+
+        $headers = [
+            'Content-Type' => Storage::disk('public')->mimeType($product->photo_path) ?? 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="' . basename((string) $product->photo_path) . '"',
+            'Cache-Control' => 'public, max-age=86400',
+        ];
+
+        return Storage::disk('public')->response($product->photo_path, basename((string) $product->photo_path), $headers);
+    }
+
 
     public function delete($id)
     {

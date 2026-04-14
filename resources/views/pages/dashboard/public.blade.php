@@ -882,7 +882,7 @@
               <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                 @if ($item->photo_path)
                   <img
-                    src="{{ asset('storage/' . $item->photo_path) }}"
+                    src="{{ route('public.dashboard.photo', $item->id) }}"
                     alt="Foto {{ $item->name }}"
                     class="latest-slide-media"
                     loading="{{ $loop->first ? 'eager' : 'lazy' }}"
@@ -955,7 +955,7 @@
           @foreach ($foundItems as $item)
             <article class="card found-card">
               @if ($item->photo_path)
-                <img src="{{ asset('storage/' . $item->photo_path) }}" alt="Foto {{ $item->name }}" class="found-media">
+                <img src="{{ route('public.dashboard.photo', $item->id) }}" alt="Foto {{ $item->name }}" class="found-media">
               @else
                 <div class="found-fallback">
                   <i class="fas fa-box-open"></i>

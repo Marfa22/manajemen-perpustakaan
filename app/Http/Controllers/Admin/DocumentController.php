@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Services\SmartSearchService;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -86,6 +87,59 @@ class DocumentController extends Controller
         $document = Document::findOrFail($id);
 
         return view('pages.documents.edit', compact('document'));
+    }
+
+    public function showFile($id)
+    {
+        $document = Document::findOrFail($id);
+
+        if (empty($document->file_path) || !Storage::disk('public')->exists($document->file_path)) {
+            return redirect('/documents')->with('error', 'File dokumen tidak ditemukan.');
+        }
+
+        $extension = strtolower(pathinfo($document->file_path, PATHINFO_EXTENSION));
+        $mimeType = Storage::disk('public')->mimeType($document->file_path) ?? 'application/octet-stream';
+        $previewableExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+
+        return view('pages.documents.show', [
+            'document' => $document,
+            'previewUrl' => route('documents.file.preview', $document->id),
+            'downloadUrl' => route('documents.file.download', $document->id),
+            'fileExtension' => $extension,
+            'mimeType' => $mimeType,
+            'canPreviewInline' => in_array($extension, $previewableExtensions, true),
+        ]);
+    }
+
+    public function previewFile($id)
+    {
+        $document = Document::findOrFail($id);
+
+        if (empty($document->file_path) || !Storage::disk('public')->exists($document->file_path)) {
+            abort(Response::HTTP_NOT_FOUND, 'File dokumen tidak ditemukan.');
+        }
+
+        $headers = [
+            'Content-Type' => Storage::disk('public')->mimeType($document->file_path) ?? 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="' . basename((string) $document->file_path) . '"',
+        ];
+
+        return Storage::disk('public')->response($document->file_path, basename((string) $document->file_path), $headers);
+    }
+
+    public function downloadFile($id)
+    {
+        $document = Document::findOrFail($id);
+
+        if (empty($document->file_path) || !Storage::disk('public')->exists($document->file_path)) {
+            return redirect('/documents')->with('error', 'File dokumen tidak ditemukan.');
+        }
+
+        $downloadName = trim((string) $document->nama_dokumen) !== ''
+            ? $document->nama_dokumen . '.' . pathinfo((string) $document->file_path, PATHINFO_EXTENSION)
+            : basename((string) $document->file_path);
+
+        return Storage::disk('public')->download($document->file_path, $downloadName);
     }
 
     public function update(Request $request, $id)

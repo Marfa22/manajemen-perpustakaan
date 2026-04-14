@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Services\SmartSearchService;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class PublicDashboardController extends Controller
 {
@@ -157,5 +159,28 @@ class PublicDashboardController extends Controller
             'item' => $item,
             'relatedItems' => $relatedItems,
         ]);
+    }
+
+    public function photo(int $id)
+    {
+        $item = Product::query()
+            ->where('item_type', 'found')
+            ->where(function ($query) {
+                $query->where('pickup_status', 'belum_diambil')
+                    ->orWhereNull('pickup_status');
+            })
+            ->findOrFail($id);
+
+        if (empty($item->photo_path) || !Storage::disk('public')->exists($item->photo_path)) {
+            abort(Response::HTTP_NOT_FOUND, 'Foto barang temuan tidak ditemukan.');
+        }
+
+        $headers = [
+            'Content-Type' => Storage::disk('public')->mimeType($item->photo_path) ?? 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="' . basename((string) $item->photo_path) . '"',
+            'Cache-Control' => 'public, max-age=300',
+        ];
+
+        return Storage::disk('public')->response($item->photo_path, basename((string) $item->photo_path), $headers);
     }
 }

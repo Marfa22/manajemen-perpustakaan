@@ -248,13 +248,13 @@
                         @php
                           $fileExt = strtolower(pathinfo($inventory->photo_path, PATHINFO_EXTENSION));
                           $isImageFile = in_array($fileExt, ['jpg', 'jpeg', 'png'], true);
-                          $fileUrl = asset('storage/' . $inventory->photo_path);
+                          $previewUrl = route('inventory.file.preview', $inventory->id);
                         @endphp
                         <div class="doc-preview-stack">
                           @if ($isImageFile)
-                            <img src="{{ $fileUrl }}" alt="Dokumen {{ $inventory->nama }}" class="item-photo-thumb mb-2">
+                            <img src="{{ $previewUrl }}" alt="Dokumen {{ $inventory->nama }}" class="item-photo-thumb mb-2">
                           @endif
-                          <a href="{{ $fileUrl }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                          <a href="{{ route('inventory.file.show', $inventory->id) }}" class="btn btn-outline-primary btn-sm">
                             Lihat
                           </a>
                         </div>

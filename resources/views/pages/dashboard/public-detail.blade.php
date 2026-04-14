@@ -313,7 +313,7 @@
     <section class="detail-grid">
       <article class="detail-photo-wrap">
         @if ($item->photo_path)
-          <img src="{{ asset('storage/' . $item->photo_path) }}" alt="Foto {{ $item->name }}" class="detail-photo">
+          <img src="{{ route('public.dashboard.photo', $item->id) }}" alt="Foto {{ $item->name }}" class="detail-photo">
         @else
           <div class="detail-photo-fallback">
             <i class="fas fa-box-open"></i>
@@ -363,7 +363,7 @@
           @foreach ($relatedItems as $related)
             <article class="related-card">
               @if ($related->photo_path)
-                <img src="{{ asset('storage/' . $related->photo_path) }}" alt="Foto {{ $related->name }}" class="related-media">
+                <img src="{{ route('public.dashboard.photo', $related->id) }}" alt="Foto {{ $related->name }}" class="related-media">
               @else
                 <div class="related-fallback"><i class="fas fa-box-open"></i></div>
               @endif

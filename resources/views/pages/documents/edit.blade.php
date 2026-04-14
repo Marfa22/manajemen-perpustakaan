@@ -96,12 +96,15 @@
                   @endphp
                   <div class="mt-3">
                     @if ($existingFileIsImage)
-                      <img src="{{ asset('storage/' . $document->file_path) }}" alt="Dokumen {{ $document->nama_dokumen }}" class="item-photo-preview">
+                      <img src="{{ route('documents.file.preview', $document->id) }}" alt="Dokumen {{ $document->nama_dokumen }}" class="item-photo-preview">
                     @else
-                      <a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                      <a href="{{ route('documents.file.show', $document->id) }}" class="btn btn-outline-primary btn-sm">
                         Lihat
                       </a>
                     @endif
+                    <a href="{{ route('documents.file.download', $document->id) }}" class="btn btn-outline-secondary btn-sm ml-2">
+                      Download
+                    </a>
                   </div>
                 @endif
               </div>
